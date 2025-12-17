@@ -1,0 +1,54 @@
+---
+- name: Backup MikroTik configuration
+  hosts: mikrotik_routers
+  gather_facts: false
+  vars:
+    backup_dir: "/ansible/artifacts/backups"
+  collections:
+    - community.routeros
+  tasks:
+    - name: Generate fixed timestamp at start
+      set_fact:
+        timestamp: "{{ '%Y%m%d_%H%M%S' | strftime }}"
+
+    - name: Ensure backup directory exists
+      ansible.builtin.file:
+        path: "{{ backup_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Export running configuration via API
+      community.routeros.command:
+        commands:
+          - "/export file=backup_{{ timestamp }} show-sensitive"
+      register: export_result
+
+    - name: "Download file"
+      ansible.netcommon.net_get:
+        src: "backup_{{ timestamp }}.rsc"
+        dest: "{{ backup_dir }}/{{ inventory_hostname }}_{{ timestamp }}.rsc"
+      when: export_result is succeeded
+
+    - name: Remove temporary file from router
+      community.routeros.command:
+        commands:
+          - "/file remove backup_{{ timestamp }}.rsc"
+      when: export_result is succeeded
+
+    - name: Create ZIP archive of backup
+      ansible.builtin.archive:
+        path: "{{ backup_dir }}/{{ inventory_hostname }}_{{ timestamp }}.rsc"
+        format: zip
+        dest: "{{ backup_dir }}/{{ inventory_hostname }}_{{ timestamp }}.zip"
+      when: export_result is succeeded
+
+    - name: Clean up local RSC file
+      ansible.builtin.file:
+        path: "{{ backup_dir }}/{{ inventory_hostname }}_{{ timestamp }}.rsc"
+        state: absent
+      when: export_result is succeeded
+
+    - name: Display backup status
+      ansible.builtin.debug:
+        msg: "Backup completed for {{ inventory_hostname }}: {{ backup_dir }}/{{ inventory_hostname }}_{{ timestamp }}.zip"
+
