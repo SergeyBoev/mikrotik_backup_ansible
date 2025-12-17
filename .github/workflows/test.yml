@@ -8,8 +8,6 @@ jobs:
     steps:
       - name: Check OS
         run: uname -a
-      - name: Check .NET version
-        run: dotnet --version
       - name: List files
         run: ls -la
       - name: Print env vars
