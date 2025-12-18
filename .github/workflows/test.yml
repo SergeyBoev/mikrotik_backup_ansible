@@ -12,9 +12,6 @@ jobs:
         run: ls -la
       - name: Print env vars
         run: printenv 
-      - name: CheckDocker
-        if: always()
-        run: docker -v
       - name: Install unzip
         run: |
           sudo apt-get update
