@@ -22,5 +22,4 @@ jobs:
       - name: CheckAws
         if: always()
         run: aws --version
-      - name: Verify AWS CLI
-        run: ~/.local/bin/aws --version        
+
