@@ -13,6 +13,8 @@ jobs:
       - name: Print env vars
         run: printenv 
       - name: CheckDocker
+        if: always()
         run: docker -v
       - name: CheckAws
+        if: always()
         run: aws --version
