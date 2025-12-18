@@ -12,10 +12,6 @@ jobs:
         run: ls -la
       - name: Print env vars
         run: printenv 
-      - name: Install unzip
-        run: |
-          apt-get update
-          apt-get install -y unzip        
       - name: Setup AWS CLI
         if: always()
         run: |
