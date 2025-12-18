@@ -11,4 +11,8 @@ jobs:
       - name: List files
         run: ls -la
       - name: Print env vars
-        run: printenv | grep GITHUB
+        run: printenv 
+      - name: CheckDocker
+        run: docker -v
+      - name: CheckAws
+        run: aws --version
