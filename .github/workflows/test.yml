@@ -15,6 +15,12 @@ jobs:
       - name: CheckDocker
         if: always()
         run: docker -v
+      - name: Install AWS CLI
+        run: |
+          python -m pip install --upgrade pip
+          pip install awscli --upgrade --user        
       - name: CheckAws
         if: always()
         run: aws --version
+      - name: Verify AWS CLI
+        run: ~/.local/bin/aws --version        
